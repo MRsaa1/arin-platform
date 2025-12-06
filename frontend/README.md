@@ -36,3 +36,42 @@ src/
 └── lib/             # Утилиты
 ```
 
+
+
+#ARIN Frontend
+
+A frontend application for the ARIN Platform in the SAA Alliance corporate style.
+
+## Style
+
+- **Color scheme**: Dark theme with gold accents
+- **Logo**: SAA Alliance style
+- **Font**: Inter (same as saa-alliance.com)
+
+## Installation
+
+```bash
+npm install
+```
+
+## Run
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000)
+
+## Structure
+
+```
+src/
+├── app/ # Next.js App Router
+├── components/ # React components
+│ ├── common/ # Common components (Header, Footer)
+│ ├── agents/ # Agent-specific components
+│ ├── risks/ # Risk Components
+│ ├── graph/ # Graph Components
+│ └── alerts/ # Alert Components
+└── lib/ # Utilities
+```
