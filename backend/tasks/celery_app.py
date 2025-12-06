@@ -15,7 +15,11 @@ celery_app = Celery(
     "arin_platform",
     broker=settings.redis_url,  # Redis как message broker
     backend=settings.redis_url,  # Redis как result backend
-    include=["backend.tasks.risk_analysis_tasks", "backend.tasks.model_training_tasks"]
+    include=[
+        "backend.tasks.risk_analysis_tasks",
+        "backend.tasks.model_training_tasks",
+        "backend.tasks.compliance_tasks"
+    ]
 )
 
 # Конфигурация Celery
@@ -43,8 +47,16 @@ celery_app.conf.beat_schedule = {
         "schedule": crontab(hour=2, minute=0),  # Каждый день в 2:00
     },
     "cleanup-old-data": {
-        "task": "backend.tasks.risk_analysis_tasks.cleanup_old_data",
+        "task": "backend.tasks.compliance_tasks.cleanup_old_data",
         "schedule": crontab(hour=3, minute=0),  # Каждый день в 3:00
+    },
+    "create-scheduled-backup": {
+        "task": "backend.tasks.compliance_tasks.create_scheduled_backup",
+        "schedule": crontab(hour=2, minute=0),  # Каждый день в 2:00
+    },
+    "cleanup-old-backups": {
+        "task": "backend.tasks.compliance_tasks.cleanup_old_backups",
+        "schedule": crontab(day_of_week=0, hour=4, minute=0),  # Каждое воскресенье в 4:00
     },
 }
 

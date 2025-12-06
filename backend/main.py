@@ -10,7 +10,7 @@ import logging
 from backend.config import settings
 from backend.orchestrator.orchestrator import Orchestrator
 from backend.graph_builder.graph_builder import GraphBuilder
-from backend.api.routes import agents, risks, graph, alerts, health, llm, ml_models, performance, tasks
+from backend.api.routes import agents, risks, graph, alerts, health, llm, ml_models, performance, tasks, auth, compliance
 
 # Настройка логирования
 logging.basicConfig(
@@ -91,9 +91,51 @@ async def lifespan(app: FastAPI):
 # Создание FastAPI приложения
 app = FastAPI(
     title="ARIN Platform",
-    description="Autonomous Risk Intelligence Network - Multi-agent system for predictive risk management",
+    description="""
+    **Autonomous Risk Intelligence Network** - Institutional-Grade Multi-Agent System for Predictive Risk Management
+    
+    ## Features
+    
+    * **6 Specialized Risk Agents**: Credit, Market, Operational, Liquidity, Regulatory, Systemic
+    * **Graph-Based Analysis**: Dependency analysis and cascade effect detection
+    * **LLM Integration**: DeepSeek R1 (NVIDIA API) for reasoning, GPT-4 as fallback
+    * **ML Models**: XGBoost for credit risk, GNN for systemic analysis
+    * **Real-time Monitoring**: Performance monitoring and health checks
+    * **Production Ready**: Docker/Kubernetes support, load balancing, caching
+    
+    ## Authentication
+    
+    Most endpoints require authentication. Use `/api/v1/auth/login` to get a JWT token.
+    
+    Include the token in the Authorization header: `Bearer <token>`
+    
+    ## Documentation
+    
+    * [User Guide](docs/user-guide.md)
+    * [Admin Guide](docs/admin-guide.md)
+    * [Deployment Guide](docs/deployment-guide.md)
+    * [API Reference](docs/api-reference.md)
+    """,
     version="1.0.0",
-    lifespan=lifespan
+    lifespan=lifespan,
+    contact={
+        "name": "ARIN Platform Support",
+        "email": "support@arin-platform.com",
+    },
+    license_info={
+        "name": "MIT",
+        "url": "https://opensource.org/licenses/MIT",
+    },
+    servers=[
+        {
+            "url": "http://localhost:8000",
+            "description": "Development server"
+        },
+        {
+            "url": "https://api.arin-platform.com",
+            "description": "Production server"
+        }
+    ]
 )
 
 # CORS middleware
@@ -109,8 +151,14 @@ app.add_middleware(
 from backend.middleware.performance_middleware import PerformanceMonitoringMiddleware
 app.add_middleware(PerformanceMonitoringMiddleware)
 
+# Audit logging middleware
+from backend.middleware.audit_middleware import AuditMiddleware
+app.add_middleware(AuditMiddleware)
+
 # Подключение роутеров
 app.include_router(health.router, tags=["health"])
+app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
+app.include_router(compliance.router, prefix="/api/v1/compliance", tags=["compliance"])
 app.include_router(agents.router, prefix="/api/v1/agents", tags=["agents"])
 app.include_router(risks.router, prefix="/api/v1/risks", tags=["risks"])
 app.include_router(graph.router, prefix="/api/v1/graph", tags=["graph"])

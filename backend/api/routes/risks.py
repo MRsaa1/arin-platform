@@ -37,9 +37,45 @@ async def analyze_risk(
     """
     Запустить анализ риска
     
-    Args:
-        request: Запрос на анализ
-        async_mode: Если True, выполняется асинхронно через Celery
+    Выполняет анализ риска для указанной сущности с использованием соответствующих агентов.
+    
+    **Типы анализа**:
+    - `credit_analysis`: Кредитный риск
+    - `market_analysis`: Рыночный риск
+    - `operational_analysis`: Операционный риск
+    - `liquidity_analysis`: Риск ликвидности
+    - `regulatory_analysis`: Регуляторный риск
+    - `systemic_analysis`: Системный риск
+    - `comprehensive_analysis`: Комплексный анализ всех типов
+    
+    **Асинхронный режим**:
+    - Если `async_mode=true`, анализ выполняется через Celery
+    - Возвращает `task_id` для отслеживания статуса
+    - Используйте `GET /api/v1/tasks/{task_id}` для проверки статуса
+    
+    **Примеры**:
+    
+    Кредитный анализ:
+    ```json
+    {
+      "type": "credit_analysis",
+      "entity_id": "AAPL",
+      "entity_type": "company",
+      "parameters": {
+        "include_news": true,
+        "include_financials": true
+      }
+    }
+    ```
+    
+    Комплексный анализ:
+    ```json
+    {
+      "type": "comprehensive_analysis",
+      "entity_id": "MSFT",
+      "entity_type": "company"
+    }
+    ```
     """
     if not orchestrator:
         raise HTTPException(status_code=503, detail="Orchestrator not initialized")
