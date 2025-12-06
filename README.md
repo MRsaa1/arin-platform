@@ -8,6 +8,8 @@
 
 ARIN Platform - это комплексная система управления рисками на основе Agentic AI, которая использует 6 специализированных агентов для анализа кредитных, рыночных, операционных, ликвидных, регуляторных и системных рисков.
 
+ARIN Platform - is a comprehensive risk management system based on Agentic AI, which uses 6 specialized agents to analyze credit, market, operational, liquidity, regulatory, and systemic risks.
+
 ## 🌟 Особенности
 
 - **6 Специализированных Агентов**: Credit, Market, Operational, Liquidity, Regulatory, Systemic Risk Agents
