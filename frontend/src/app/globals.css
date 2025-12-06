@@ -1,0 +1,162 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --saa-dark: #1a1a1a;
+  --saa-darker: #0f0f0f;
+  --saa-gold: #CBA135;
+  --saa-gold-dark: #8B6F47;
+  --saa-white: #FFFFFF;
+  --saa-gray: #2a2a2a;
+  --saa-border: #404040;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  background-color: var(--saa-dark);
+  color: var(--saa-white);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+body {
+  color: var(--saa-white);
+  background: var(--saa-dark);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* SAA Alliance стили */
+.saa-gold-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--saa-gold), transparent);
+  margin: 1rem 0;
+}
+
+/* Анимированная золотая линия - появляется при загрузке, проходит туда-сюда и останавливается в центре */
+.saa-gold-line-continuous {
+  height: 1px;
+  position: relative;
+  overflow: visible;
+  margin: 1rem 0;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+}
+
+.saa-gold-line-continuous::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 400px;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent 0%,
+    var(--saa-gold) 25%,
+    var(--saa-gold) 75%,
+    transparent 100%
+  );
+  animation: moveGoldLineBackForth 7s ease-in-out forwards;
+}
+
+@keyframes moveGoldLineBackForth {
+  0% {
+    left: -400px;
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  50% {
+    left: 100vw;
+  }
+  55% {
+    left: 100vw;
+  }
+  90% {
+    left: calc(50% - 200px);
+    opacity: 1;
+  }
+  100% {
+    left: calc(50% - 200px);
+    opacity: 1;
+  }
+}
+
+.saa-card {
+  background: var(--saa-gray);
+  border: 1px solid var(--saa-border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.saa-card:hover {
+  border-color: var(--saa-gold);
+  box-shadow: 0 4px 20px rgba(203, 161, 53, 0.2);
+}
+
+.saa-button {
+  background: var(--saa-gold);
+  color: var(--saa-darker);
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.saa-button:hover {
+  background: var(--saa-gold-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(203, 161, 53, 0.3);
+}
+
+.saa-button-secondary {
+  background: transparent;
+  color: var(--saa-white);
+  border: 1px solid var(--saa-border);
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.saa-button-secondary:hover {
+  border-color: var(--saa-gold);
+  color: var(--saa-gold);
+}
+
+/* Scrollbar стили */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--saa-darker);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--saa-gold);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--saa-gold-dark);
+}
+

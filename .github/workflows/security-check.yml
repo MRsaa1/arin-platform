@@ -1,0 +1,35 @@
+name: Security Check
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Check for secrets
+        run: |
+          # Проверка на наличие реальных API ключей
+          if grep -r "sk-[a-zA-Z0-9]{32,}" . --exclude-dir=.git --exclude-dir=node_modules; then
+            echo "⚠️  Potential OpenAI API key found!"
+            exit 1
+          fi
+          
+          if grep -r "nvapi-[a-zA-Z0-9]{32,}" . --exclude-dir=.git --exclude-dir=node_modules; then
+            echo "⚠️  Potential NVIDIA API key found!"
+            exit 1
+          fi
+          
+          # Проверка на .env файлы
+          if find . -name ".env" -not -path "./.git/*" | grep -q .; then
+            echo "⚠️  .env file found! Should not be committed."
+            exit 1
+          fi
+          
+          echo "✅ Security check passed"
+
