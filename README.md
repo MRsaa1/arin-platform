@@ -20,6 +20,14 @@ ARIN Platform - is a comprehensive risk management system based on Agentic AI, w
 - **Scalable Architecture**: Docker Swarm / Kubernetes ready
 - **Production Ready**: Load balancing, caching, async processing
 
+6 Specialized Agents: Credit, Market, Operational, Liquidity, Regulatory, Systemic Risk Agents
+Graph-Based Analysis: Analyze relationships and cascade effects through a dependency graph
+LLM Integration: DeepSeek R1 (NVIDIA API) for reasoning and GPT-4 as a fallback
+ML Models: XGBoost for credit risk, GNN for system analysis
+Real-time Monitoring: Performance monitoring and health checks
+Scalable Architecture: Docker Swarm / Kubernetes ready
+Production Ready: Load balancing, caching, async processing
+
 ## 🏗️ Архитектура
 
 ```
