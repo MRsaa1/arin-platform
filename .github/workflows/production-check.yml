@@ -1,0 +1,67 @@
+name: Production Readiness Check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  production-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: Install dependencies
+        run: |
+          pip install -r backend/requirements.txt
+      
+      - name: Run production readiness check
+        run: |
+          python scripts/verify_production_readiness.py
+      
+      - name: Check for secrets
+        run: |
+          # Проверка на реальные API ключи
+          if grep -r "sk-[a-zA-Z0-9]\{32,\}" backend --exclude-dir=__pycache__; then
+            echo "⚠️  Potential OpenAI API key found!"
+            exit 1
+          fi
+          
+          if grep -r "nvapi-[a-zA-Z0-9]\{32,\}" backend --exclude-dir=__pycache__; then
+            echo "⚠️  Potential NVIDIA API key found!"
+            exit 1
+          fi
+          
+          echo "✅ No secrets found in code"
+      
+      - name: Check documentation
+        run: |
+          required_docs=(
+            "README.md"
+            "docs/user-guide.md"
+            "docs/admin-guide.md"
+            "docs/deployment-guide.md"
+            "SECURITY.md"
+          )
+          
+          for doc in "${required_docs[@]}"; do
+            if [ ! -f "$doc" ]; then
+              echo "❌ Missing documentation: $doc"
+              exit 1
+            fi
+          done
+          
+          echo "✅ All required documentation present"
+      
+      - name: Lint check
+        run: |
+          pip install flake8 black
+          black --check backend/ || true
+          flake8 backend/ --max-line-length=120 --ignore=E501,W503 || true
+
