@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     # Neo4j
     neo4j_url: str = "bolt://localhost:7687"
     neo4j_user: str = "neo4j"
-    neo4j_password: str = "arin"
+    neo4j_password: str = ""  # Должен быть установлен через NEO4J_PASSWORD env var
     
     # API Keys
     # Приоритет: DeepSeek R1 через NVIDIA API для reasoning задач, GPT-4 как fallback
