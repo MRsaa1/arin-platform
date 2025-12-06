@@ -16,8 +16,9 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     
     # Database
-    database_url: str = "postgresql://arin:arin@localhost:5432/arin"
-    timescaledb_url: str = "postgresql://arin:arin@localhost:5433/arin_ts"
+    # ⚠️ ВАЖНО: Используйте переменные окружения DATABASE_URL и TIMESCALEDB_URL
+    database_url: str = ""  # Должен быть установлен через DATABASE_URL env var
+    timescaledb_url: str = ""  # Должен быть установлен через TIMESCALEDB_URL env var
     redis_url: str = "redis://localhost:6379"
     
     # Neo4j
@@ -42,7 +43,8 @@ class Settings(BaseSettings):
     nvidia_parse_model: str = "nemotron-parse"
     
     # Security
-    secret_key: str = "change-this-secret-key-in-production"
+    # ⚠️ ВАЖНО: Сгенерируйте уникальный SECRET_KEY для production!
+    secret_key: str = ""  # Должен быть установлен через SECRET_KEY env var
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
     
