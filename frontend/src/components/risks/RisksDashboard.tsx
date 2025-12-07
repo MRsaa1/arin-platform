@@ -11,7 +11,7 @@ export default function RisksDashboard() {
     setAnalyzing(true)
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/risks/analyze`,
+        `${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/risks/analyze`,
         {
           type: 'comprehensive_analysis',
           entity_id: 'test_entity',

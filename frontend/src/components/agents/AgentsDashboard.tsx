@@ -26,7 +26,7 @@ export default function AgentsDashboard() {
 
   const fetchAgents = async () => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/agents`)
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/agents`)
       setAgents(response.data)
       setLoading(false)
     } catch (error) {

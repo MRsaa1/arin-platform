@@ -14,7 +14,7 @@ export default function GraphVisualization() {
   const fetchGraph = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/graph`
+        `${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/graph`
       )
       setGraphData(response.data)
       setLoading(false)

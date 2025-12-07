@@ -24,7 +24,7 @@ export default function AlertsPanel() {
   const fetchAlerts = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/alerts`
+        `${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/alerts`
       )
       setAlerts(response.data)
       setLoading(false)
