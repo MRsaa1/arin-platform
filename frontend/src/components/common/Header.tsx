@@ -18,15 +18,6 @@ export default function Header() {
             </div>
           </div>
 
-          {/* Actions - как на saa-alliance.com */}
-          <div className="flex items-center space-x-4">
-            <button className="text-saa-white hover:text-saa-gold transition-colors text-sm font-medium">
-              Sign in
-            </button>
-            <button className="bg-saa-darker border border-saa-border text-saa-white hover:border-saa-gold hover:text-saa-gold transition-colors px-4 py-2 rounded text-sm font-medium">
-              Get Access
-            </button>
-          </div>
         </div>
       </div>
     </header>
