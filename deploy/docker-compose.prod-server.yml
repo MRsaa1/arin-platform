@@ -51,8 +51,6 @@ services:
   neo4j:
     image: neo4j:5
     container_name: arin-neo4j
-    env_file:
-      - ../.env
     environment:
       NEO4J_AUTH: neo4j/${NEO4J_PASSWORD}
       NEO4J_PLUGINS: '["apoc"]'
