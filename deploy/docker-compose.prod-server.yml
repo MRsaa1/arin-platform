@@ -90,7 +90,7 @@ services:
   # Backend API - изолированный порт 18000 (только localhost, доступ через Nginx)
   backend:
     build:
-      context: .
+      context: ..
       dockerfile: infrastructure/docker/Dockerfile.backend
     container_name: arin-backend
     environment:
@@ -113,8 +113,6 @@ services:
         condition: service_healthy
       neo4j:
         condition: service_healthy
-    volumes:
-      - ./backend:/app/backend
     networks:
       - arin-network
     restart: unless-stopped
