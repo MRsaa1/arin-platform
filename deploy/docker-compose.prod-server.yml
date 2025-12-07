@@ -5,6 +5,8 @@ services:
   postgres:
     image: postgres:15
     container_name: arin-postgres
+    env_file:
+      - ../.env
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-arin}
       POSTGRES_USER: ${POSTGRES_USER:-arin}
@@ -26,6 +28,8 @@ services:
   timescaledb:
     image: timescale/timescaledb:latest-pg15
     container_name: arin-timescaledb
+    env_file:
+      - ../.env
     environment:
       POSTGRES_DB: ${TIMESCALEDB_DB:-arin_ts}
       POSTGRES_USER: ${TIMESCALEDB_USER:-arin}
@@ -47,6 +51,8 @@ services:
   neo4j:
     image: neo4j:5
     container_name: arin-neo4j
+    env_file:
+      - ../.env
     environment:
       NEO4J_AUTH: neo4j/${NEO4J_PASSWORD}
       NEO4J_PLUGINS: '["apoc"]'
