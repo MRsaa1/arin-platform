@@ -5,7 +5,10 @@ from fastapi import APIRouter, HTTPException
 from typing import List, Optional
 from pydantic import BaseModel
 
-from backend.main import orchestrator
+# Lazy import to avoid circular dependency
+def get_orchestrator():
+    from backend.main import orchestrator
+    return orchestrator
 
 router = APIRouter()
 
@@ -21,6 +24,7 @@ class AgentStatusResponse(BaseModel):
 @router.get("", response_model=List[AgentStatusResponse])
 async def list_agents():
     """Получить список всех агентов"""
+    orchestrator = get_orchestrator()
     if not orchestrator:
         raise HTTPException(status_code=503, detail="Orchestrator not initialized")
     

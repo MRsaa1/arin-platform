@@ -473,31 +473,6 @@ class CreditRiskAgent(BaseAgent):
                 "analysis": f"LLM analysis failed: {str(e)}",
                 "model": None
             }
-                            reasoning_parts.append(reasoning)
-                            
-                        # Final content (финальный ответ)
-                        if chunk.choices[0].delta.content is not None:
-                            content_parts.append(chunk.choices[0].delta.content)
-                    
-                    reasoning_text = "".join(reasoning_parts) if reasoning_parts else None
-                    analysis_text = "".join(content_parts)
-                    
-                    risk_assessment = self._parse_llm_response(analysis_text)
-                    
-                    return {
-                        "analysis": analysis_text,
-                        "reasoning": reasoning_text,  # Процесс рассуждения DeepSeek R1
-                        "model": "deepseek-ai/deepseek-r1",
-                        "risk_assessment": risk_assessment,
-                        "timestamp": datetime.now().isoformat(),
-                        "reasoning_quality": "high",  # DeepSeek R1 лучше для reasoning
-                        "via_nvidia": True
-                    }
-                except Exception as e:
-                    logger.warning(f"DeepSeek R1 analysis failed: {e}, falling back to GPT-4")
-                    # Fallback к GPT-4
-                    
-            # Fallback: GPT-4
             if self.llm_client:
                 response = self.llm_client.chat.completions.create(
                     model="gpt-4",

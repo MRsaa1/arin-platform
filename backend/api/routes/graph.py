@@ -5,9 +5,15 @@ from fastapi import APIRouter, HTTPException, Query
 from typing import Optional, List
 from pydantic import BaseModel
 
-from backend.main import graph_builder_instance
+# Lazy import to avoid circular dependency
+def get_graph_builder():
+    from backend.main import graph_builder_instance
+    return graph_builder_instance
 
 router = APIRouter()
+
+# Get graph_builder_instance at module level
+graph_builder_instance = None
 
 
 class GraphNodeRequest(BaseModel):
@@ -32,16 +38,19 @@ async def get_graph(
     node_filter: Optional[List[str]] = Query(None, description="Filter nodes by IDs")
 ):
     """Получить граф зависимостей"""
-    if not graph_builder_instance:
+    graph_builder = get_graph_builder()
+    if not graph_builder:
         raise HTTPException(status_code=503, detail="Graph Builder not initialized")
     
     try:
-        graph_data = await graph_builder_instance.get_graph_for_visualization(
+        graph_data = await graph_builder.get_graph_for_visualization(
             node_filter=node_filter,
             max_nodes=max_nodes
         )
         return graph_data
     except Exception as e:
+        import logging
+        logging.error(f"Error getting graph: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -52,11 +61,12 @@ async def find_paths(
     max_depth: int = Query(3, description="Maximum path depth")
 ):
     """Найти пути влияния между узлами"""
-    if not graph_builder_instance:
+    graph_builder = get_graph_builder()
+    if not graph_builder:
         raise HTTPException(status_code=503, detail="Graph Builder not initialized")
     
     try:
-        paths = await graph_builder_instance.find_influence_paths(
+        paths = await graph_builder.find_influence_paths(
             source, target, max_depth=max_depth
         )
         return {"paths": paths}
@@ -70,11 +80,12 @@ async def analyze_cascade(
     max_depth: int = Query(3, description="Maximum cascade depth")
 ):
     """Анализ каскадных эффектов от узла"""
-    if not graph_builder_instance:
+    graph_builder = get_graph_builder()
+    if not graph_builder:
         raise HTTPException(status_code=503, detail="Graph Builder not initialized")
     
     try:
-        cascade = await graph_builder_instance.analyze_cascade_effects(
+        cascade = await graph_builder.analyze_cascade_effects(
             source, max_depth=max_depth
         )
         return cascade
@@ -85,11 +96,12 @@ async def analyze_cascade(
 @router.get("/statistics")
 async def get_graph_statistics():
     """Получить статистику графа"""
-    if not graph_builder_instance:
+    graph_builder = get_graph_builder()
+    if not graph_builder:
         raise HTTPException(status_code=503, detail="Graph Builder not initialized")
     
     try:
-        stats = await graph_builder_instance.get_graph_statistics()
+        stats = await graph_builder.get_graph_statistics()
         return stats
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -98,11 +110,12 @@ async def get_graph_statistics():
 @router.post("/nodes")
 async def add_node(request: GraphNodeRequest):
     """Добавить узел в граф"""
-    if not graph_builder_instance:
+    graph_builder = get_graph_builder()
+    if not graph_builder:
         raise HTTPException(status_code=503, detail="Graph Builder not initialized")
     
     try:
-        graph_builder_instance.add_node(
+        graph_builder.add_node(
             node_id=request.node_id,
             node_type=request.node_type,
             properties=request.properties
@@ -115,11 +128,12 @@ async def add_node(request: GraphNodeRequest):
 @router.post("/edges")
 async def add_edge(request: GraphEdgeRequest):
     """Добавить связь в граф"""
-    if not graph_builder_instance:
+    graph_builder = get_graph_builder()
+    if not graph_builder:
         raise HTTPException(status_code=503, detail="Graph Builder not initialized")
     
     try:
-        graph_builder_instance.add_edge(
+        graph_builder.add_edge(
             source_id=request.source_id,
             target_id=request.target_id,
             relationship_type=request.relationship_type,
@@ -137,11 +151,12 @@ async def detect_clusters(
     min_cluster_size: int = Query(3, description="Minimum cluster size")
 ):
     """Обнаружить кластеры рисков в графе"""
-    if not graph_builder_instance:
+    graph_builder = get_graph_builder()
+    if not graph_builder:
         raise HTTPException(status_code=503, detail="Graph Builder not initialized")
     
     try:
-        clusters = await graph_builder_instance.detect_clusters(
+        clusters = await graph_builder.detect_clusters(
             method=method,
             min_cluster_size=min_cluster_size
         )
@@ -156,11 +171,12 @@ async def find_hotspots(
     min_cluster_size: int = Query(3, description="Minimum cluster size")
 ):
     """Найти горячие точки риска"""
-    if not graph_builder_instance:
+    graph_builder = get_graph_builder()
+    if not graph_builder:
         raise HTTPException(status_code=503, detail="Graph Builder not initialized")
     
     try:
-        hotspots = await graph_builder_instance.find_risk_hotspots(
+        hotspots = await graph_builder.find_risk_hotspots(
             min_risk_threshold=min_risk_threshold,
             min_cluster_size=min_cluster_size
         )
@@ -176,11 +192,12 @@ async def get_graph_visualization(
     include_clusters: bool = Query(True, description="Include cluster information")
 ):
     """Получить граф для улучшенной визуализации с кластерами"""
-    if not graph_builder_instance:
+    graph_builder = get_graph_builder()
+    if not graph_builder:
         raise HTTPException(status_code=503, detail="Graph Builder not initialized")
     
     try:
-        graph_data = await graph_builder_instance.get_graph_for_visualization_enhanced(
+        graph_data = await graph_builder.get_graph_for_visualization_enhanced(
             node_filter=node_filter,
             max_nodes=max_nodes,
             include_clusters=include_clusters
@@ -193,11 +210,12 @@ async def get_graph_visualization(
 @router.post("/update")
 async def update_graph():
     """Обновить граф зависимостей"""
-    if not graph_builder_instance:
+    graph_builder = get_graph_builder()
+    if not graph_builder:
         raise HTTPException(status_code=503, detail="Graph Builder not initialized")
     
     try:
-        await graph_builder_instance.save_to_database()
+        await graph_builder.save_to_database()
         return {"message": "Graph update initiated"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
