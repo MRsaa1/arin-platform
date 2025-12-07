@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   icons: {
     icon: '/favicon.ico',
   },
+  other: {
+    'preload': 'false', // Отключаем автоматическую предзагрузку для оптимизации
+  },
 }
 
 export default function RootLayout({
