@@ -1,0 +1,135 @@
+version: '3.8'
+
+services:
+  # PostgreSQL - изолированный порт 15432
+  postgres:
+    image: postgres:15
+    container_name: arin-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-arin}
+      POSTGRES_USER: ${POSTGRES_USER:-arin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - arin_postgres_data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:15432:5432"  # Только localhost, изолированный порт
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-arin}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - arin-network
+    restart: unless-stopped
+
+  # TimescaleDB - изолированный порт 15433
+  timescaledb:
+    image: timescale/timescaledb:latest-pg15
+    container_name: arin-timescaledb
+    environment:
+      POSTGRES_DB: ${TIMESCALEDB_DB:-arin_ts}
+      POSTGRES_USER: ${TIMESCALEDB_USER:-arin}
+      POSTGRES_PASSWORD: ${TIMESCALEDB_PASSWORD}
+    volumes:
+      - arin_timescaledb_data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:15433:5432"  # Только localhost, изолированный порт
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${TIMESCALEDB_USER:-arin}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - arin-network
+    restart: unless-stopped
+
+  # Neo4j - изолированные порты 17687, 17474
+  neo4j:
+    image: neo4j:5
+    container_name: arin-neo4j
+    environment:
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD}
+      NEO4J_PLUGINS: '["apoc"]'
+    volumes:
+      - arin_neo4j_data:/data
+      - arin_neo4j_logs:/logs
+    ports:
+      - "127.0.0.1:17687:7687"  # Только localhost
+      - "127.0.0.1:17474:7474"  # Только localhost
+    healthcheck:
+      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "${NEO4J_PASSWORD}", "RETURN 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - arin-network
+    restart: unless-stopped
+
+  # Redis - изолированный порт 16379
+  redis:
+    image: redis:7-alpine
+    container_name: arin-redis
+    command: redis-server --appendonly yes --maxmemory 2gb --maxmemory-policy allkeys-lru
+    volumes:
+      - arin_redis_data:/data
+    ports:
+      - "127.0.0.1:16379:6379"  # Только localhost, изолированный порт
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - arin-network
+    restart: unless-stopped
+
+  # Backend API - изолированный порт 18000 (только localhost, доступ через Nginx)
+  backend:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.backend
+    container_name: arin-backend
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-arin}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-arin}
+      TIMESCALEDB_URL: postgresql://${TIMESCALEDB_USER:-arin}:${TIMESCALEDB_PASSWORD}@timescaledb:5432/${TIMESCALEDB_DB:-arin_ts}
+      REDIS_URL: redis://redis:6379
+      NEO4J_URL: bolt://neo4j:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD}
+      NVIDIA_API_KEY: ${NVIDIA_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      SECRET_KEY: ${SECRET_KEY}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    ports:
+      - "127.0.0.1:18000:8000"  # Только localhost, доступ через Nginx
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app/backend
+    networks:
+      - arin-network
+    restart: unless-stopped
+    command: uvicorn backend.main:app --host 0.0.0.0 --port 8000 --workers 4
+
+volumes:
+  arin_postgres_data:
+    name: arin_postgres_data
+  arin_timescaledb_data:
+    name: arin_timescaledb_data
+  arin_neo4j_data:
+    name: arin_neo4j_data
+  arin_neo4j_logs:
+    name: arin_neo4j_logs
+  arin_redis_data:
+    name: arin_redis_data
+
+networks:
+  arin-network:
+    driver: bridge
+    name: arin-network
+
