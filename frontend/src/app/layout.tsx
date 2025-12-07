@@ -7,6 +7,9 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'ARIN Platform - Autonomous Risk Intelligence Network',
   description: 'Multi-agent system for predictive risk management',
+  icons: {
+    icon: '/favicon.ico',
+  },
 }
 
 export default function RootLayout({
